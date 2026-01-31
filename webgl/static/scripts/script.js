@@ -135,6 +135,7 @@ class CubeMap{
     constructor(gl){
         this.webglInstance = gl;
         this.texture = this.webglInstance.createTexture();
+        this.webglInstance.bindTexture(this.webglInstance.TEXTURE_CUBE_MAP, this.texture);
     }
 
     bind(unit = 0){
@@ -181,6 +182,8 @@ const config = {
     color: [0.0, 0.0, 0.0]
 }
 
+const cubeMaps = [];
+
 function draw(gl, shader, vertexConfiguration){
 
 
@@ -200,30 +203,36 @@ function draw(gl, shader, vertexConfiguration){
     shader.setUniformMatrix4("model", model);
     shader.setUniformMatrix4("projection", projection);
     shader.setUniformMatrix4("view", view);
-
+    
     shader.setUniformVector3("color", config.color);
     shader.setUniformInteger("use_cube_map", config.use_color === 1 ? 0 : 1);
+    
     shader.setUniformInteger("cube_map", 0);
     
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
     gl.bindVertexArray(vertexConfiguration);
+    cubeMaps[2].bind(0);
     gl.drawArrays(gl.TRIANGLES, 0, 36);
-
+    
     model = mat4.create();
     mat4.scale(model, model, [0.5, 0.5, 0.5]);
     mat4.translate(model, model, [-3.0, 0.0, 0.0]);
     mat4.rotateY(model, model, time * -2);
     
     shader.setUniformMatrix4("model", model);
+    shader.setUniformInteger("cube_map", 0);
+    
+    gl.bindVertexArray(vertexConfiguration);
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 
      model = mat4.create();
-    mat4.scale(model, model, [0.5, 0.5, 0.5]);
+     mat4.scale(model, model, [0.5, 0.5, 0.5]);
     mat4.translate(model, model, [3.0, 0.0, 0.0]);
     mat4.rotateY(model, model, time * 2);
     
     shader.setUniformMatrix4("model", model);
+        shader.setUniformInteger("cube_map", 0);
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 
     requestAnimationFrame(() => draw(gl, shader, vertexConfiguration));
@@ -302,6 +311,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     uniform vec3 color;
     uniform samplerCube cube_map;
+
+    uniform int cube_map_index;
     uniform int use_cube_map;
 
     out vec4 fragColor;
@@ -375,18 +386,17 @@ document.addEventListener("DOMContentLoaded", function() {
     
    const faceImages = [];
     const faceUrls = [
-    'static/images/image.png',
-    'static/images/image.png',
-    'static/images/image.png',
-    'static/images/image.png',
-    'static/images/image.png',
-    'static/images/image.png',
+    'static/images/niyas.jpg',
+    'static/images/niyas.jpg',
+    'static/images/niyas.jpg',
+    'static/images/niyas.jpg',
+    'static/images/niyas.jpg',
+    'static/images/niyas.jpg',
     ];
 
     let imagesLoaded = 0;
 
     cubeMap = new CubeMap(gl);
-    cubeMap.bind(0);
     cubeMap.setParameters({
     TEXTURE_MIN_FILTER: gl.LINEAR,
     TEXTURE_MAG_FILTER: gl.LINEAR,
@@ -407,8 +417,78 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
     }
-    gl.enable(gl.DEPTH_TEST);
 
+    const faceImages2 = [];
+    const faceUrls2 = [
+    'static/images/gou.jpg',
+    'static/images/gou.jpg',
+    'static/images/gou.jpg',
+    'static/images/gou.jpg',
+    'static/images/gou.jpg',
+    'static/images/gou.jpg',
+    ];
+
+    let imagesLoaded2 = 0;
+
+    cubeMap2 = new CubeMap(gl);
+    cubeMap2.setParameters({
+    TEXTURE_MIN_FILTER: gl.LINEAR,
+    TEXTURE_MAG_FILTER: gl.LINEAR,
+    TEXTURE_WRAP_S: gl.CLAMP_TO_EDGE,
+    TEXTURE_WRAP_T: gl.CLAMP_TO_EDGE,
+    TEXTURE_WRAP_R: gl.CLAMP_TO_EDGE,
+    });
+
+    for (let i = 0; i < faceUrls2.length; i++) {
+    const image = new Image();
+    image.src = faceUrls2[i];
+    image.onload = function () {
+        faceImages2[i] = image;
+        imagesLoaded2++;
+
+        if (imagesLoaded2 === faceUrls2.length) {
+        cubeMap2.uploadImages(faceImages2);
+        }
+    };
+    }
+
+    const faceImages3 = [];
+    const faceUrls3 = [
+    'static/images/anas.jpg',
+    'static/images/anas.jpg',
+    'static/images/anas.jpg',
+    'static/images/anas.jpg',
+    'static/images/anas.jpg',
+    'static/images/anas.jpg',
+    ];
+
+    let imagesLoaded3 = 0;
+
+    cubeMap3 = new CubeMap(gl);
+    cubeMap3.setParameters({
+    TEXTURE_MIN_FILTER: gl.LINEAR,
+    TEXTURE_MAG_FILTER: gl.LINEAR,
+    TEXTURE_WRAP_S: gl.CLAMP_TO_EDGE,
+    TEXTURE_WRAP_T: gl.CLAMP_TO_EDGE,
+    TEXTURE_WRAP_R: gl.CLAMP_TO_EDGE,
+    });
+
+    for (let i = 0; i < faceUrls3.length; i++) {
+    const image = new Image();
+    image.src = faceUrls3[i];
+    image.onload = function () {
+        faceImages3[i] = image;
+        imagesLoaded3++;
+
+        if (imagesLoaded3 === faceUrls3.length) {
+        cubeMap3.uploadImages(faceImages3);
+        }
+    };
+    }
+    gl.enable(gl.DEPTH_TEST);
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+
+    cubeMaps.push(cubeMap, cubeMap2, cubeMap3);
     draw(gl, shaderr, vertexConfig);
     window.dispatchEvent(new Event("resize"));
 });

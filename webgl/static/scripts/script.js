@@ -186,7 +186,7 @@ function draw(gl, shader, vertexConfiguration){
 
     const time = performance.now() * 0.001;
     
-    const model = mat4.create();
+    let model = mat4.create();
     mat4.scale(model, model, [0.5, 0.5, 0.5]);
     mat4.rotateY(model, model, time);
 
@@ -209,6 +209,23 @@ function draw(gl, shader, vertexConfiguration){
     
     gl.bindVertexArray(vertexConfiguration);
     gl.drawArrays(gl.TRIANGLES, 0, 36);
+
+    model = mat4.create();
+    mat4.scale(model, model, [0.5, 0.5, 0.5]);
+    mat4.translate(model, model, [-3.0, 0.0, 0.0]);
+    mat4.rotateY(model, model, time * -2);
+    
+    shader.setUniformMatrix4("model", model);
+    gl.drawArrays(gl.TRIANGLES, 0, 36);
+
+     model = mat4.create();
+    mat4.scale(model, model, [0.5, 0.5, 0.5]);
+    mat4.translate(model, model, [3.0, 0.0, 0.0]);
+    mat4.rotateY(model, model, time * 2);
+    
+    shader.setUniformMatrix4("model", model);
+    gl.drawArrays(gl.TRIANGLES, 0, 36);
+
     requestAnimationFrame(() => draw(gl, shader, vertexConfiguration));
 };
 
@@ -358,12 +375,12 @@ document.addEventListener("DOMContentLoaded", function() {
     
    const faceImages = [];
     const faceUrls = [
-    'static/images/mulli1.jpg',
-    'static/images/mulli1.jpg',
-    'static/images/mulli1.jpg',
-    'static/images/mulli1.jpg',
-    'static/images/mulli1.jpg',
-    'static/images/mulli1.jpg',
+    'static/images/image.png',
+    'static/images/image.png',
+    'static/images/image.png',
+    'static/images/image.png',
+    'static/images/image.png',
+    'static/images/image.png',
     ];
 
     let imagesLoaded = 0;
